@@ -7,6 +7,7 @@ const UserSchema = new mongoose.Schema({
     minLength: 3,
     maxLength: 50,
   },
+
   email: {
     type: String,
     required: [true, 'Please provide email'],
@@ -21,8 +22,13 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Please provide password'],
     minLength: 6,
-    maxLength: 12,
   },
+});
+
+// The function below takes the password just before it's sent, then hash it and send it to the DB.
+UserSchema.pre('save', async function () {
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password, salt);
 });
 
 module.exports = mongoose.model('User', UserSchema);
